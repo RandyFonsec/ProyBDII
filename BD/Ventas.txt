@@ -1,0 +1,114 @@
+--POSTGRESQL VENTAS
+
+
+
+
+Drop DATABASE Sales;
+-- Conectar a la base de datos "Sales" (si no estás conectado ya)
+CREATE DATABASE Sales;
+\c sales;
+
+
+
+DROP TABLE IF EXISTS OrderState;
+DROP TABLE IF EXISTS ProductsByOrder;
+DROP TABLE IF EXISTS "Order";
+
+-- Crear la tabla "OrderState"
+CREATE TABLE OrderState (
+    order_state_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    deleted BOOLEAN
+);
+
+-- Crear la tabla "Order"
+CREATE TABLE "Order" (
+    order_id SERIAL PRIMARY KEY,
+    client_id INT,
+    state_id INT,
+    reviewed_by INT,
+    date DATE
+);
+
+-- Crear la tabla "ProductsByOrder" con la clave foránea
+CREATE TABLE ProductsByOrder (
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    FOREIGN KEY (order_id) REFERENCES "Order" (order_id)
+);
+
+
+-- Insertar datos de prueba en la tabla "OrderState"
+INSERT INTO OrderState (name, deleted) VALUES
+    ('Solicitada', false),
+    ('En traslado', false);
+
+-- Insertar datos de prueba en la tabla "Order"
+INSERT INTO "Order" (client_id, state_id, reviewed_by, date) VALUES
+    (1, 1, 101, '2023-01-15'),
+    (1, 2, 102, '2023-02-20'),
+    (2, 1, 103, '2023-03-25');
+
+-- Insertar datos de prueba en la tabla "ProductsByOrder"
+INSERT INTO ProductsByOrder (order_id, product_id, quantity) VALUES
+    (1, 101, 5),
+    (1, 102, 10),
+    (2, 103, 8),
+    (3, 101, 3),
+    (3, 104, 6);
+
+
+-- Debe ser con funcion para retornar tabla
+-- Retorna ordenes pendientes
+CREATE OR REPLACE FUNCTION get_orders()
+RETURNS TABLE (
+    order_id INT,
+    client_id INT,
+    state_id INT,
+    reviewed_by INT,
+    date DATE
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT "Order".order_id, "Order".client_id, "Order".state_id, "Order".reviewed_by, "Order".date
+    FROM "Order"
+    WHERE "Order".state_id = 1
+	ORDER BY "Order".date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_orders();
+
+
+
+-- Codigos de productos de una orden
+-- Crear una función que retorna registros asociados a un order_id en "ProductsByOrder"
+CREATE OR REPLACE FUNCTION get_products_by_order(order_id INT)
+RETURNS TABLE (
+    product_id INT,
+    quantity INT
+) AS $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM "Order" WHERE "Order".order_id = get_products_by_order.order_id) THEN
+        RAISE EXCEPTION 'El order_id % no es valido.', get_products_by_order.order_id;
+    END IF;
+
+    RETURN QUERY
+    SELECT PB.product_id, PB.quantity
+    FROM ProductsByOrder AS PB
+    WHERE PB.order_id = get_products_by_order.order_id;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_products_by_order(1); 
+
+
+
+CREATE USER user_sales WITH PASSWORD '1234';
+GRANT CONNECT ON DATABASE sales TO user_sales;
+GRANT SELECT ON TABLE "Order" TO user_sales;
+GRANT EXECUTE ON FUNCTION get_products_by_order(integer) TO user_sales;
+GRANT SELECT ON TABLE ProductsByOrder TO user_sales;
+
+
