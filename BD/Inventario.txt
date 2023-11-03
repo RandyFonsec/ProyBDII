@@ -1,0 +1,162 @@
+SQL SERVER Inventory
+-- Crear un inicio de sesión (login) para el nuevo usuario
+USE master;
+CREATE LOGIN [user_inv] WITH PASSWORD = '1234';
+
+-- Cambiar al contexto de la base de datos "Inventory"
+USE Inventory;
+
+-- Crear un usuario en la base de datos "Inventory" asociado al inicio de sesión (login)
+CREATE USER [user_inv] FOR LOGIN [user_inv];
+
+-- Asignar al usuario permisos para ejecutar procedimientos almacenados
+GRANT EXECUTE TO [user_inv];
+
+
+-- Crear la base de datos "Inventory"
+CREATE DATABASE Inventory;
+GO
+
+-- Usar la base de datos "Inventory"
+USE Inventory;
+GO
+
+-- Crear la tabla "Country"
+CREATE TABLE Country (
+    country_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+GO
+
+-- Crear la tabla "ProductCategory"
+CREATE TABLE ProductCategory (
+    prod_cat_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+GO
+
+-- Crear la tabla "WhareHouse"
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
+GO
+
+-- Crear la tabla "Product"
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+GO
+
+
+
+-- Insertar datos de prueba en la tabla "Country"
+INSERT INTO Country (country_id, name, deleted)
+VALUES (1, 'USA', 0),
+       (2, 'Canada', 0),
+       (3, 'UK', 0);
+
+-- Insertar datos de prueba en la tabla "ProductCategory"
+INSERT INTO ProductCategory (prod_cat_id, name, deleted)
+VALUES (1, 'Electrónica', 0),
+       (2, 'Ropa', 0),
+       (3, 'Alimentos', 0);
+
+-- Insertar datos de prueba en la tabla "WareHouse"
+INSERT INTO WareHouse (wh_id, name, latitude, longitude, deleted)
+VALUES (1, 'Almacén 1', 40.7128, -74.0060, 0),
+       (2, 'Almacén 2', 34.0522, -118.2437, 0),
+       (3, 'Almacén 3', 51.5074, -0.1278, 0);
+
+-- Insertar datos de prueba en la tabla "Product"
+INSERT INTO Product (product_id, category_id, wh_id, unique_code, name, price, stock, available)
+VALUES (1, 1, 1, 'PROD001', 'Teléfono móvil', 499.99, 100, 1),
+       (2, 2, 2, 'PROD002', 'Camiseta', 19.99, 200, 1),
+       (3, 3, 3, 'PROD003', 'Arroz', 4.99, 500, 1);
+
+
+
+	   -- Crear un procedimiento almacenado para obtener todos los productos
+-- Crear un procedimiento almacenado para obtener todos los productos con detalles de categoría
+CREATE PROCEDURE GetAllProducts
+AS
+BEGIN
+    SELECT 
+        p.product_id AS ProductID,
+        p.category_id AS CategoryID,
+        pc.name AS CategoryName,
+        p.wh_id AS WarehouseID,
+        p.unique_code AS UniqueCode,
+        p.name AS ProductName,
+        p.price AS Price,
+        p.stock AS Stock,
+        p.available AS Available
+    FROM Product p
+    INNER JOIN ProductCategory pc ON p.category_id = pc.prod_cat_id;
+END;
+
+Exec GetAllProducts;
+
+--Info de productos dada una lista
+CREATE PROCEDURE GetProductsInfo
+    @ProductIDs NVARCHAR(MAX)
+AS
+BEGIN
+    -- Validar que @ProductIDs no esté vacío o sea nulo
+    IF @ProductIDs IS NULL OR LTRIM(RTRIM(@ProductIDs)) = ''
+    BEGIN
+        RAISERROR('La lista de product_id no puede estar vacía.', 16, 1);
+        RETURN;
+    END;
+
+    -- Validar que @ProductIDs contenga únicamente números separados por comas
+    IF PATINDEX('%[^0-9,]%', @ProductIDs) > 0
+    BEGIN
+        raiserror('La lista de product_id contiene caracteres no válidos.', 1, 1);
+        RETURN -100;
+    END;
+
+    -- Crear una tabla temporal para almacenar los product_id
+    DECLARE @ProductTable TABLE (ProductID INT);
+
+    -- Insertar los product_id de la lista en la tabla temporal
+    INSERT INTO @ProductTable
+    SELECT value
+    FROM STRING_SPLIT(@ProductIDs, ',');
+
+    -- Validar que al menos un product_id válido se haya insertado
+    IF NOT EXISTS (SELECT 1 FROM @ProductTable)
+    BEGIN
+        raiserror('No se encontraron product_id válidos en la lista.', 1, 1);
+        RETURN -100;
+    END;
+
+    -- Consulta para obtener información de los productos
+    SELECT
+        p.product_id AS ProductID,
+        pc.name AS Category,
+        p.unique_code AS UniqueCode,
+        p.name AS ProductName,
+        p.price AS Price,
+        p.stock AS Stock,
+        p.available AS Available
+    FROM Product p
+    INNER JOIN ProductCategory pc ON p.category_id = pc.prod_cat_id
+    WHERE p.product_id IN (SELECT ProductID FROM @ProductTable);
+END;
+
+

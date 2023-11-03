@@ -17,8 +17,13 @@ function SalesmanPoint() {
     fetchData();
   }, []);
 
+
+  const contStyle={
+    background:'yellow',
+
+  }
   return (
-    <div>
+    <div style = {contStyle}>
       <h1>API Consumer</h1>
       <ul>
       {"item.order_id " }|||{ " item.date"}
