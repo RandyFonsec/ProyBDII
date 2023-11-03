@@ -4,7 +4,7 @@ const config = {
   user:  'user_inv', // sql user
   password:  '1234', //sql user password
   server:  'localhost', // if it does not work try- localhost
-  database:  'Inventory',
+  database:  'Inventory_North',
   options: {
     trustedconnection:  true,
     enableArithAbort:  true,

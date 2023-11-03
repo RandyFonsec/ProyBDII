@@ -1,11 +1,12 @@
 --POSTGRESQL VENTAS
-
-
-
-
 Drop DATABASE Sales;
--- Conectar a la base de datos "Sales" (si no estás conectado ya)
+
+
+-- Conectar a la base de datos "Sales"
 CREATE DATABASE Sales;
+-- Habilitar la extensión PostGIS
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 \c sales;
 
 
@@ -14,14 +15,12 @@ DROP TABLE IF EXISTS OrderState;
 DROP TABLE IF EXISTS ProductsByOrder;
 DROP TABLE IF EXISTS "Order";
 
--- Crear la tabla "OrderState"
 CREATE TABLE OrderState (
     order_state_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     deleted BOOLEAN
 );
 
--- Crear la tabla "Order"
 CREATE TABLE "Order" (
     order_id SERIAL PRIMARY KEY,
     client_id INT,
@@ -30,7 +29,6 @@ CREATE TABLE "Order" (
     date DATE
 );
 
--- Crear la tabla "ProductsByOrder" con la clave foránea
 CREATE TABLE ProductsByOrder (
     order_id INT,
     product_id INT,
@@ -39,18 +37,15 @@ CREATE TABLE ProductsByOrder (
 );
 
 
--- Insertar datos de prueba en la tabla "OrderState"
 INSERT INTO OrderState (name, deleted) VALUES
     ('Solicitada', false),
     ('En traslado', false);
 
--- Insertar datos de prueba en la tabla "Order"
 INSERT INTO "Order" (client_id, state_id, reviewed_by, date) VALUES
     (1, 1, 101, '2023-01-15'),
     (1, 2, 102, '2023-02-20'),
     (2, 1, 103, '2023-03-25');
 
--- Insertar datos de prueba en la tabla "ProductsByOrder"
 INSERT INTO ProductsByOrder (order_id, product_id, quantity) VALUES
     (1, 101, 5),
     (1, 102, 10),
@@ -83,7 +78,6 @@ SELECT * FROM get_orders();
 
 
 -- Codigos de productos de una orden
--- Crear una función que retorna registros asociados a un order_id en "ProductsByOrder"
 CREATE OR REPLACE FUNCTION get_products_by_order(order_id INT)
 RETURNS TABLE (
     product_id INT,

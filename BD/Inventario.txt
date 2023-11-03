@@ -1,25 +1,117 @@
 SQL SERVER Inventory
--- Crear un inicio de sesión (login) para el nuevo usuario
 USE master;
 CREATE LOGIN [user_inv] WITH PASSWORD = '1234';
-
--- Cambiar al contexto de la base de datos "Inventory"
-USE Inventory;
-
--- Crear un usuario en la base de datos "Inventory" asociado al inicio de sesión (login)
 CREATE USER [user_inv] FOR LOGIN [user_inv];
-
--- Asignar al usuario permisos para ejecutar procedimientos almacenados
 GRANT EXECUTE TO [user_inv];
 
+CREATE DATABASE Inventory_North;
+CREATE DATABASE Inventory_Caribbean;
+CREATE DATABASE Inventory_South;
+USE Inventory_North;
+CREATE TABLE ProductCategory (
+    prod_cat_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
 
--- Crear la base de datos "Inventory"
-CREATE DATABASE Inventory;
-GO
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
 
--- Usar la base de datos "Inventory"
-USE Inventory;
-GO
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+
+USE Inventory_Caribbean;
+CREATE TABLE ProductCategory (
+    prod_cat_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
+
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+
+
+USE Inventory_South;
+
+CREATE TABLE ProductCategory (
+    prod_cat_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+
+
+
+-- En la base de datos "Inventory_North"
+USE Inventory_North;
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+USE Inventory_North;
+GRANT EXECUTE TO user_inv;
+-- En la base de datos "Inventory_South"
+USE Inventory_South;
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+GRANT EXECUTE TO user_inv;
+-- En la base de datos "Inventory_Caribbean"
+USE Inventory_Caribbean;
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+GRANT EXECUTE TO user_inv;
+
+
 
 -- Crear la tabla "Country"
 CREATE TABLE Country (
@@ -62,54 +154,9 @@ CREATE TABLE Product (
 );
 GO
 
+USE Inventory_North;
+GO;
 
-
--- Insertar datos de prueba en la tabla "Country"
-INSERT INTO Country (country_id, name, deleted)
-VALUES (1, 'USA', 0),
-       (2, 'Canada', 0),
-       (3, 'UK', 0);
-
--- Insertar datos de prueba en la tabla "ProductCategory"
-INSERT INTO ProductCategory (prod_cat_id, name, deleted)
-VALUES (1, 'Electrónica', 0),
-       (2, 'Ropa', 0),
-       (3, 'Alimentos', 0);
-
--- Insertar datos de prueba en la tabla "WareHouse"
-INSERT INTO WareHouse (wh_id, name, latitude, longitude, deleted)
-VALUES (1, 'Almacén 1', 40.7128, -74.0060, 0),
-       (2, 'Almacén 2', 34.0522, -118.2437, 0),
-       (3, 'Almacén 3', 51.5074, -0.1278, 0);
-
--- Insertar datos de prueba en la tabla "Product"
-INSERT INTO Product (product_id, category_id, wh_id, unique_code, name, price, stock, available)
-VALUES (1, 1, 1, 'PROD001', 'Teléfono móvil', 499.99, 100, 1),
-       (2, 2, 2, 'PROD002', 'Camiseta', 19.99, 200, 1),
-       (3, 3, 3, 'PROD003', 'Arroz', 4.99, 500, 1);
-
-
-
-	   -- Crear un procedimiento almacenado para obtener todos los productos
--- Crear un procedimiento almacenado para obtener todos los productos con detalles de categoría
-CREATE PROCEDURE GetAllProducts
-AS
-BEGIN
-    SELECT 
-        p.product_id AS ProductID,
-        p.category_id AS CategoryID,
-        pc.name AS CategoryName,
-        p.wh_id AS WarehouseID,
-        p.unique_code AS UniqueCode,
-        p.name AS ProductName,
-        p.price AS Price,
-        p.stock AS Stock,
-        p.available AS Available
-    FROM Product p
-    INNER JOIN ProductCategory pc ON p.category_id = pc.prod_cat_id;
-END;
-
-Exec GetAllProducts;
 
 --Info de productos dada una lista
 CREATE PROCEDURE GetProductsInfo
@@ -160,3 +207,135 @@ BEGIN
 END;
 
 
+--Stock de un producto en cada base
+DROP PROCEDURE GetProductStock
+
+CREATE PROCEDURE GetProductStock
+(
+    @unique VARCHAR(64)
+)
+AS
+BEGIN
+    DECLARE @stock INT;
+
+    SELECT
+        wh_id, stock 
+    FROM
+        (
+            SELECT
+                stock, wh_id
+            FROM
+                Inventory_North.dbo.Product
+            WHERE
+                unique_code = @unique
+            UNION
+            SELECT
+                stock, wh_id
+            FROM
+                Inventory_Caribbean.dbo.Product
+            WHERE
+                unique_code = @unique
+            UNION
+            SELECT
+                stock, wh_id
+            FROM
+                Inventory_South.dbo.Product
+            WHERE
+                unique_code = @unique
+        ) AS t;
+
+    SET @stock = ISNULL(@stock, 0);
+    RETURN @stock;
+	
+END;
+
+DECLARE @product_id VARCHAR(64) = 'HMR123';
+
+EXEC GetProductStock @product_id;
+
+
+-- Dada una lista de productos, obtener stock en cada base
+DROP PROCEDURE GetProductStockSummary
+
+CREATE PROCEDURE GetProductStockSummary
+(
+    @productUniqueCodes VARCHAR(MAX)
+)
+AS
+BEGIN
+    DECLARE @results TABLE (unique_code VARCHAR(64), inv_1 INT, inv_2 INT, inv_3 INT);
+
+    -- Obtener los resultados para cada base de datos y almacenarlos en la tabla de resultados
+    INSERT INTO @results (unique_code, inv_1, inv_2, inv_3)
+    SELECT
+        COALESCE(n.unique_code, c.unique_code, s.unique_code) AS unique_code,
+        COALESCE(n.stock, 0) AS inv_1,
+        COALESCE(c.stock, 0) AS inv_2,
+        COALESCE(s.stock, 0) AS inv_3
+    FROM (
+        SELECT unique_code, stock FROM Inventory_North.dbo.Product
+        WHERE unique_code IN (SELECT value FROM STRING_SPLIT(@productUniqueCodes, ','))
+    ) n
+    FULL JOIN (
+        SELECT unique_code, stock FROM Inventory_Caribbean.dbo.Product
+        WHERE unique_code IN (SELECT value FROM STRING_SPLIT(@productUniqueCodes, ','))
+    ) c ON n.unique_code = c.unique_code
+    FULL JOIN (
+        SELECT unique_code, stock FROM Inventory_South.dbo.Product
+        WHERE unique_code IN (SELECT value FROM STRING_SPLIT(@productUniqueCodes, ','))
+    ) s ON n.unique_code = s.unique_code;
+
+    -- Consulta final para obtener los resultados combinados
+    SELECT * FROM @results;
+END;
+
+
+EXEC GetProductStockSummary 'HMR123,HMR456,FGE789';
+
+
+
+-- Obtener productos disponibles sin repetidos:
+
+DROP PROCEDURE GetAvailableProducts
+CREATE PROCEDURE GetAvailableProducts
+AS
+BEGIN
+    SELECT DISTINCT
+        pc.name AS cat_name,
+        p.unique_code AS unique_code,
+        p.name AS name,
+        p.price AS price
+    FROM (
+        SELECT unique_code, category_id, name, price
+        FROM Inventory_North.dbo.Product
+        WHERE available = 1 AND stock > 0
+        UNION ALL
+        SELECT unique_code, category_id, name, price
+        FROM Inventory_Caribbean.dbo.Product
+        WHERE available = 1 AND stock > 0
+        UNION ALL
+        SELECT unique_code, category_id, name, price
+        FROM Inventory_South.dbo.Product
+        WHERE available = 1 AND stock > 0
+    ) AS p
+    INNER JOIN (
+        SELECT
+            prod_cat_id AS prod_cat,
+            name
+        FROM Inventory_North.dbo.ProductCategory
+        UNION ALL
+        SELECT
+            prod_cat_id AS prod_cat,
+            name
+        FROM Inventory_Caribbean.dbo.ProductCategory
+        UNION ALL
+        SELECT
+            prod_cat_id AS prod_cat,
+            name
+        FROM Inventory_South.dbo.ProductCategory
+    ) AS pc ON pc.prod_cat = p.category_id;
+END;
+
+
+
+EXEC GetAvailableProducts;
