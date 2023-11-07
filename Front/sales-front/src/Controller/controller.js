@@ -12,6 +12,10 @@ const controller = {
     const response = await dao.getProducts(id_order);
     return response;
   },
+  getProductStockSummary: async (productUniqueCodes) => {
+    const response = await dao.getProductStockSummary(productUniqueCodes);
+    return response;
+  },
 };
 
 module.exports = controller;

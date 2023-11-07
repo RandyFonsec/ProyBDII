@@ -1,36 +1,52 @@
-// daoUsers.js
-
 //Se encarga de llamar a la api
-const BASE = "http://localhost:3000";
+// API VENTAS EN ESTE PUERTO 
+const BASE = "http://localhost:3001/api";
+const BASE_INV = "http://localhost:3000";
 
 const daoUsers = {
+
+
   getOrders: async () => {
-    // Construye la URL con los parámetros adecuados para la API en tu servidor
+    //API BASE + ENDPOINT
     const url = BASE+`/orders`;
     try {
       const response = await fetch(url);
-
       if (!response.ok) {
         throw new Error('La solicitud no fue exitosa');
       }
-      return response.json(); // Parsea la respuesta JSON y la retorna
+      return response.json();
     } catch (error) {
       console.error('Error en la función getOrders:', error);
       throw error;
     }
   },
+
+
   getProducts: async (id_order) => {
-    // Construye la URL con los parámetros adecuados para la API en tu servidor
     const url = BASE+`/products/${id_order}`;
     try {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('La solicitud no fue exitosa');
       }
-
-      return response.json(); // Parsea la respuesta JSON y la retorna
+      return response.json(); 
     } catch (error) {
       console.error('Error en la función getProducts:', error);
+      throw error;
+    }
+  },
+
+  getProductStockSummary: async (productUniqueCodes) => {
+    const url = `${BASE_INV}/api/getProductStockSummary?productUniqueCodes=${productUniqueCodes}`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('La solicitud no fue exitosa');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error en la función getProductStockSummary:', error);
       throw error;
     }
   },

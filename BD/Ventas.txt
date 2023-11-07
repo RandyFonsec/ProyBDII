@@ -31,7 +31,7 @@ CREATE TABLE "Order" (
 
 CREATE TABLE ProductsByOrder (
     order_id INT,
-    product_id INT,
+    product_id VARCHAR(128),
     quantity INT,
     FOREIGN KEY (order_id) REFERENCES "Order" (order_id)
 );
@@ -39,19 +39,20 @@ CREATE TABLE ProductsByOrder (
 
 INSERT INTO OrderState (name, deleted) VALUES
     ('Solicitada', false),
-    ('En traslado', false);
+    ('En traslado', false),
+	('Rechazada', false);
 
 INSERT INTO "Order" (client_id, state_id, reviewed_by, date) VALUES
-    (1, 1, 101, '2023-01-15'),
-    (1, 2, 102, '2023-02-20'),
-    (2, 1, 103, '2023-03-25');
+    (1, 1, 0, '2023-01-15'),
+    (1, 2, 0, '2023-02-20'),
+    (2, 1, 0, '2023-03-25');
 
-INSERT INTO ProductsByOrder (order_id, product_id, quantity) VALUES
-    (1, 101, 5),
-    (1, 102, 10),
-    (2, 103, 8),
-    (3, 101, 3),
-    (3, 104, 6);
+INSERT INTO ProductsByOrder (order_id, product_id, quantity) VALUES 
+(1, 'FGE789', 5),
+(1, 'FGE789', 10),
+(2, HMR123', 8),
+(3, 'HMR123', 3),
+(3, 'HMR456', 6);
 
 
 -- Debe ser con funcion para retornar tabla
@@ -77,10 +78,11 @@ SELECT * FROM get_orders();
 
 
 
--- Codigos de productos de una orden
-CREATE OR REPLACE FUNCTION get_products_by_order(order_id INT)
+-- Codigos de productos unicos de una orden
+DROP FUNCTION  get_products_by_order(in_order_id INT)
+CREATE OR REPLACE FUNCTION get_products_by_order(in_order_id INT)
 RETURNS TABLE (
-    product_id INT,
+    product_id VARCHAR,
     quantity INT
 ) AS $$
 BEGIN
@@ -91,7 +93,7 @@ BEGIN
     RETURN QUERY
     SELECT PB.product_id, PB.quantity
     FROM ProductsByOrder AS PB
-    WHERE PB.order_id = get_products_by_order.order_id;
+    WHERE PB.order_id = in_order_id;
 END;
 $$ LANGUAGE plpgsql;
 

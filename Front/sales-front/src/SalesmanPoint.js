@@ -1,38 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import controller from './Controller/controller.js'
+import React, { useState } from 'react';
+import Navigation from './Navigation.js';
+import Inbox from './Inbox.js';
+import SelectedOrder from './SelectedOrder.js';
+
+const style = {
+  height: '100vh',
+  margin: '5%',
+};
+
 function SalesmanPoint() {
-  const [data, setData] = useState([]);
-  const url = 'URL_DE_TU_API'; // Reemplaza 'URL_DE_TU_API' con la URL de tu API
+  const [selectedOrder, setSelectedOrder] = useState(-1);
+  const handleOrderSelect = (orderInfo) => {
+    setSelectedOrder(orderInfo);
+  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await controller.getOrders();
-        setData(response);
-      } catch (error) {
-        console.error('Error en la función fetchData:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-
-  const contStyle={
-    background:'yellow',
-
-  }
   return (
-    <div style = {contStyle}>
-      <h1>API Consumer</h1>
-      <ul>
-      {"item.order_id " }|||{ " item.date"}
-  {data.map((item, idx) => (
-    <li key={idx}>{item.order_id } ---- { item.date}</li>
-  ))}
-</ul>
+    <>
 
-    </div>
+      <Navigation />
+      <div style={style}>
+        <h1 className="mb-5">Módulo de ventas</h1>
+        <Inbox onOrderSelect={handleOrderSelect} />
+        <SelectedOrder selectedOrder={selectedOrder} />
+      </div>
+
+    </>
   );
 }
 
