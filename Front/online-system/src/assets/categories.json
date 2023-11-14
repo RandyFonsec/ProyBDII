@@ -1,0 +1,18 @@
+[
+  { "id": 1, "name": "Bebidas calientes" },
+  { "id": 2, "name": "Frescos" },
+  { "id": 3, "name": "Frutas" },
+  { "id": 4, "name": "Gallo pinto" },
+  { "id": 5, "name": "Huevo" },
+  { "id": 6, "name": "Proteicos" },
+  { "id": 7, "name": "Acompañamientos desayuno" },
+  { "id": 8, "name": "Arroz y frijoles" },
+  { "id": 9, "name": "Principales de carne" },
+  { "id": 10, "name": "Principales de pollo" },
+  { "id": 11, "name": "Principales de pescado y mariscos" },
+  { "id": 12, "name": "Principales vegetarianos" },
+  { "id": 13, "name": "Ensaladas" },
+  { "id": 14, "name": "Guarniciones" },
+  { "id": 15, "name": "Emparedados" },
+  { "id": 16, "name": "Café de la tarde" }
+]
