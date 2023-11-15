@@ -1,0 +1,17 @@
+.body{
+  height: 100vh;
+  width: 100wh;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav{
+  background: #F1A1F0;
+  height: 25%;
+  width: 100%;
+}
+
+.main{
+  height: 75%;
+  width: 100%;
+}

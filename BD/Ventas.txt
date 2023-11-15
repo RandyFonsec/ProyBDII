@@ -80,14 +80,15 @@ SELECT * FROM get_orders();
 
 -- Codigos de productos unicos de una orden
 DROP FUNCTION  get_products_by_order(in_order_id INT)
+
 CREATE OR REPLACE FUNCTION get_products_by_order(in_order_id INT)
 RETURNS TABLE (
     product_id VARCHAR,
     quantity INT
 ) AS $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM "Order" WHERE "Order".order_id = get_products_by_order.order_id) THEN
-        RAISE EXCEPTION 'El order_id % no es valido.', get_products_by_order.order_id;
+    IF NOT EXISTS (SELECT 1 FROM "Order" WHERE "Order".order_id = in_order_id) THEN
+        RAISE EXCEPTION 'El order_id % no es válido.', in_order_id;
     END IF;
 
     RETURN QUERY
@@ -97,14 +98,68 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 SELECT * FROM get_products_by_order(1); 
 
 
 
+
+
+
+-- Prioridad de envío
+
+DROP  FUNCTION insertar_ubicaciones;
+DELETE FROM ubicaciones;
+CREATE OR REPLACE FUNCTION insertar_ubicaciones(
+  ubicaciones JSONB[], 
+  client_lat FLOAT, 
+  client_long FLOAT
+)
+RETURNS TABLE (
+    wh_id INT,
+    distance FLOAT
+) AS $$
+BEGIN
+ DELETE FROM ubicaciones;
+  -- Insertar nuevas ubicaciones
+  INSERT INTO ubicaciones (wh_id, longitude, latitude)
+  SELECT 
+    (item->>'wh_id')::INT, 
+    (item->>'longitude')::FLOAT, 
+    (item->>'latitude')::FLOAT
+  FROM unnest(ubicaciones) AS item;
+
+  -- Seleccionar datos con cálculos adicionales
+  RETURN QUERY
+  SELECT 
+    u.wh_id,
+    ST_Distance(ST_MakePoint(u.longitude, u.latitude), ST_MakePoint(client_long, client_lat)) AS distance
+  FROM ubicaciones AS u
+  ORDER BY distance ASC;
+  
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+
+
+
+
+
+
 CREATE USER user_sales WITH PASSWORD '1234';
+
 GRANT CONNECT ON DATABASE sales TO user_sales;
 GRANT SELECT ON TABLE "Order" TO user_sales;
+
 GRANT EXECUTE ON FUNCTION get_products_by_order(integer) TO user_sales;
 GRANT SELECT ON TABLE ProductsByOrder TO user_sales;
+
+GRANT EXECUTE ON FUNCTION  insertar_ubicaciones(jsonb[]) TO user_sales;
+GRANT INSERT ON TABLE ubicaciones TO user_sales;
+GRANT DELETE ON TABLE ubicaciones TO user_sales;
 
 

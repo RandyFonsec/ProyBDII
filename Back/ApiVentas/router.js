@@ -27,4 +27,29 @@ router.get('/products/:order_id', async (req, res) => {
   }
 });
 
+router.post('/locations', async (req, res) => {
+  try {
+    
+    const { ubicaciones, client_long, client_lat } = req.body;
+    
+
+    // Ejecutar la función en PostgreSQL con los nuevos parámetros
+    const result = await db.any(
+      'SELECT * FROM insertar_ubicaciones($1::jsonb[], $2::float, $3::float)',
+      [ubicaciones, client_long, client_lat]
+    );
+
+    console.log("RESULT ",JSON.stringify(result));
+    res.json((JSON.stringify(result)));
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+
+
+
+
+
 module.exports = router;

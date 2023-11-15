@@ -1,116 +1,26 @@
-SQL SERVER Inventory
+-- SQL SERVER Inventory
+
+
+
+-- Si no se ha creado
 USE master;
 CREATE LOGIN [user_inv] WITH PASSWORD = '1234';
 CREATE USER [user_inv] FOR LOGIN [user_inv];
 GRANT EXECUTE TO [user_inv];
 
+
+DROP DATABASE Inventory_North;
+DROP DATABASE Inventory_Caribbean;
+DROP DATABASE Inventory_South;
+
 CREATE DATABASE Inventory_North;
 CREATE DATABASE Inventory_Caribbean;
 CREATE DATABASE Inventory_South;
+
+
+
 USE Inventory_North;
-CREATE TABLE ProductCategory (
-    prod_cat_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    deleted BIT
-);
-
-CREATE TABLE WareHouse (
-    wh_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    latitude DECIMAL(9, 6),
-    longitude DECIMAL(9, 6),
-    deleted BIT
-);
-
-CREATE TABLE Product (
-    product_id INT PRIMARY KEY,
-    category_id INT,
-    wh_id INT,
-    unique_code VARCHAR(20),
-    name VARCHAR(100),
-    price DECIMAL(10, 2),
-    stock INT,
-    available BIT,
-    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
-    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
-);
-
-USE Inventory_Caribbean;
-CREATE TABLE ProductCategory (
-    prod_cat_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    deleted BIT
-);
-
-CREATE TABLE WareHouse (
-    wh_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    latitude DECIMAL(9, 6),
-    longitude DECIMAL(9, 6),
-    deleted BIT
-);
-
-CREATE TABLE Product (
-    product_id INT PRIMARY KEY,
-    category_id INT,
-    wh_id INT,
-    unique_code VARCHAR(20),
-    name VARCHAR(100),
-    price DECIMAL(10, 2),
-    stock INT,
-    available BIT,
-    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
-    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
-);
-
-
-USE Inventory_South;
-
-CREATE TABLE ProductCategory (
-    prod_cat_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    deleted BIT
-);
-
-CREATE TABLE WareHouse (
-    wh_id INT PRIMARY KEY,
-    name VARCHAR(50),
-    latitude DECIMAL(9, 6),
-    longitude DECIMAL(9, 6),
-    deleted BIT
-);
-CREATE TABLE Product (
-    product_id INT PRIMARY KEY,
-    category_id INT,
-    wh_id INT,
-    unique_code VARCHAR(20),
-    name VARCHAR(100),
-    price DECIMAL(10, 2),
-    stock INT,
-    available BIT,
-    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
-    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
-);
-
-
-
--- En la base de datos "Inventory_North"
-USE Inventory_North;
-CREATE LOGIN user_inv WITH PASSWORD = '1234';
-CREATE USER user_inv FOR LOGIN user_inv;
-USE Inventory_North;
-GRANT EXECUTE TO user_inv;
--- En la base de datos "Inventory_South"
-USE Inventory_South;
-CREATE LOGIN user_inv WITH PASSWORD = '1234';
-CREATE USER user_inv FOR LOGIN user_inv;
-GRANT EXECUTE TO user_inv;
--- En la base de datos "Inventory_Caribbean"
-USE Inventory_Caribbean;
-CREATE LOGIN user_inv WITH PASSWORD = '1234';
-CREATE USER user_inv FOR LOGIN user_inv;
-GRANT EXECUTE TO user_inv;
-
+GO;
 
 
 -- Crear la tabla "Country"
@@ -123,13 +33,14 @@ GO
 
 -- Crear la tabla "ProductCategory"
 CREATE TABLE ProductCategory (
-    prod_cat_id INT PRIMARY KEY,
+    prod_cat_id INT NOT NULL IDENTITY(1,1),
     name VARCHAR(50),
-    deleted BIT
+    deleted BIT,
+	PRIMARY KEY (prod_cat_id)
 );
 GO
 
--- Crear la tabla "WhareHouse"
+-- Crear la tabla "WareHouse"
 CREATE TABLE WareHouse (
     wh_id INT PRIMARY KEY,
     name VARCHAR(50),
@@ -139,9 +50,14 @@ CREATE TABLE WareHouse (
 );
 GO
 
+INSERT INTO WareHouse VALUES(1,'Inventory_North', 1.0, 200.0, 0);
+INSERT INTO WareHouse VALUES(2,'Inventory_Caribbean', 1.0, 75.0, 0);
+INSERT INTO WareHouse VALUES(3,'Inventory_South', 1.0, -150.0, 0);
+GO
+
 -- Crear la tabla "Product"
 CREATE TABLE Product (
-    product_id INT PRIMARY KEY,
+    product_id INT NOT NULL IDENTITY(1,1),
     category_id INT,
     wh_id INT,
     unique_code VARCHAR(20),
@@ -149,10 +65,141 @@ CREATE TABLE Product (
     price DECIMAL(10, 2),
     stock INT,
     available BIT,
+	PRIMARY KEY (product_id),
     FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
     FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
 );
 GO
+
+
+
+USE Inventory_Caribbean;
+GO
+
+CREATE TABLE Country (
+    country_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+GO
+
+-- Crear la tabla "ProductCategory"
+CREATE TABLE ProductCategory (
+    prod_cat_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(50),
+    deleted BIT,
+	PRIMARY KEY (prod_cat_id)
+);
+GO
+
+-- Crear la tabla "WareHouse"
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
+GO
+INSERT INTO WareHouse VALUES(1,'Inventory_North', 1.0, 200.0, 0);
+INSERT INTO WareHouse VALUES(2,'Inventory_Caribbean', 1.0, 75.0, 0);
+INSERT INTO WareHouse VALUES(3,'Inventory_South', 1.0, -150.0, 0);
+GO
+
+-- Crear la tabla "Product"
+CREATE TABLE Product (
+    product_id INT NOT NULL IDENTITY(1,1),
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+	PRIMARY KEY (product_id),
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+GO
+
+
+USE Inventory_South;
+GO
+
+CREATE TABLE Country (
+    country_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    deleted BIT
+);
+GO
+
+-- Crear la tabla "ProductCategory"
+CREATE TABLE ProductCategory (
+    prod_cat_id INT NOT NULL IDENTITY(1,1),
+    name VARCHAR(50),
+    deleted BIT,
+	PRIMARY KEY (prod_cat_id)
+);
+GO
+
+-- Crear la tabla "WareHouse"
+CREATE TABLE WareHouse (
+    wh_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    latitude DECIMAL(9, 6),
+    longitude DECIMAL(9, 6),
+    deleted BIT
+);
+GO
+
+INSERT INTO WareHouse VALUES(1,'Inventory_North', 1.0, 200.0, 0);
+INSERT INTO WareHouse VALUES(2,'Inventory_Caribbean', 1.0, 75.0, 0);
+INSERT INTO WareHouse VALUES(3,'Inventory_South', 1.0, -150.0, 0);
+GO
+
+-- Crear la tabla "Product"
+CREATE TABLE Product (
+    product_id INT NOT NULL IDENTITY(1,1),
+    category_id INT,
+    wh_id INT,
+    unique_code VARCHAR(20),
+    name VARCHAR(100),
+    price DECIMAL(10, 2),
+    stock INT,
+    available BIT,
+	PRIMARY KEY (product_id),
+    FOREIGN KEY (category_id) REFERENCES ProductCategory(prod_cat_id),
+    FOREIGN KEY (wh_id) REFERENCES WareHouse(wh_id)
+);
+GO
+
+
+
+-- En la base de datos "Inventory_North"
+USE Inventory_North;
+GO
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+
+USE Inventory_North;
+GRANT EXECUTE TO user_inv;
+-- En la base de datos "Inventory_South"
+USE Inventory_South;
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+GRANT EXECUTE TO user_inv;
+
+
+
+USE Inventory_Caribbean;
+CREATE LOGIN user_inv WITH PASSWORD = '1234';
+CREATE USER user_inv FOR LOGIN user_inv;
+GRANT EXECUTE TO user_inv;
+
+
+
+-- ---------------------------------
+
 
 USE Inventory_North;
 GO;
@@ -293,49 +340,429 @@ END;
 EXEC GetProductStockSummary 'HMR123,HMR456,FGE789';
 
 
-
--- Obtener productos disponibles sin repetidos:
-
-DROP PROCEDURE GetAvailableProducts
-CREATE PROCEDURE GetAvailableProducts
+--  -----------------------------------------------------------------
+--  -----------------------------------------------------------------
+CREATE FUNCTION dbo.getInvName
+(
+    @Numero INT
+)
+RETURNS VARCHAR(50)
 AS
 BEGIN
-    SELECT DISTINCT
-        pc.name AS cat_name,
-        p.unique_code AS unique_code,
-        p.name AS name,
-        p.price AS price
-    FROM (
-        SELECT unique_code, category_id, name, price
-        FROM Inventory_North.dbo.Product
-        WHERE available = 1 AND stock > 0
-        UNION ALL
-        SELECT unique_code, category_id, name, price
-        FROM Inventory_Caribbean.dbo.Product
-        WHERE available = 1 AND stock > 0
-        UNION ALL
-        SELECT unique_code, category_id, name, price
-        FROM Inventory_South.dbo.Product
-        WHERE available = 1 AND stock > 0
-    ) AS p
-    INNER JOIN (
-        SELECT
-            prod_cat_id AS prod_cat,
-            name
-        FROM Inventory_North.dbo.ProductCategory
-        UNION ALL
-        SELECT
-            prod_cat_id AS prod_cat,
-            name
-        FROM Inventory_Caribbean.dbo.ProductCategory
-        UNION ALL
-        SELECT
-            prod_cat_id AS prod_cat,
-            name
-        FROM Inventory_South.dbo.ProductCategory
-    ) AS pc ON pc.prod_cat = p.category_id;
+    DECLARE @Resultado VARCHAR(50);
+
+    SELECT @Resultado = 
+        CASE 
+            WHEN @Numero = 1 THEN 'Inventory_North'
+            WHEN @Numero = 2 THEN 'Inventory_Caribbean'
+            WHEN @Numero = 3 THEN 'Inventory_South'
+            ELSE 'Otro'
+        END;
+
+    RETURN @Resultado;
 END;
 
 
 
-EXEC GetAvailableProducts;
+DROP PROCEDURE GetAvailableProducts;
+CREATE PROCEDURE GetWarehouses
+AS
+BEGIN
+    -- Seleccionar y retornar las filas de la tabla WareHouse
+    SELECT
+        wh_id,
+        name,
+        latitude,
+        longitude,
+        deleted
+    FROM
+        WareHouse
+    WHERE
+        deleted = 0; -- Otra condición si es necesario filtrar las filas eliminadas
+
+END;
+
+
+
+
+
+
+
+-- -------------------CRUD CATEGORIAS
+
+
+-- CREATE
+DROP PROCEDURE sp_CreateProductCategory
+GO
+CREATE PROCEDURE InsertProductCategory
+    @name VARCHAR(50)
+AS
+BEGIN
+    -- Verificar si la categoría ya existe
+    IF NOT EXISTS (SELECT 1 FROM ProductCategory WHERE name = @name AND deleted = 0)
+    BEGIN
+        -- Insertar nueva categoría
+        INSERT INTO ProductCategory (name, deleted)
+        VALUES (@name, 0);
+        SELECT SCOPE_IDENTITY() AS prod_cat_id; -- Devolver el ID de la nueva categoría
+    END
+    ELSE
+    BEGIN
+        -- La categoría ya existe, devolver un valor indicando que no se pudo insertar
+        SELECT -1 AS prod_cat_id;
+    END
+END;
+GO
+
+-- READ
+CREATE PROCEDURE GetProductCategories
+AS
+BEGIN
+    SELECT prod_cat_id, name, deleted
+    FROM ProductCategory
+    WHERE deleted = 0; -- Solo obtener categorías no eliminadas
+END;
+
+GO
+
+-- UPDATE
+CREATE PROCEDURE UpdateProductCategory
+    @prod_cat_id INT,
+    @name VARCHAR(50)
+AS
+BEGIN
+    -- Verificar si la categoría existe y no está marcada como eliminada
+    IF EXISTS (SELECT 1 FROM ProductCategory WHERE prod_cat_id = @prod_cat_id AND deleted = 0)
+    BEGIN
+        -- Actualizar el nombre de la categoría
+        UPDATE ProductCategory
+        SET name = @name
+        WHERE prod_cat_id = @prod_cat_id;
+
+        SELECT 1 AS success; -- Indicar que la actualización fue exitosa
+    END
+    ELSE
+    BEGIN
+        -- La categoría no existe o está marcada como eliminada
+        SELECT 0 AS success; -- Indicar que la actualización no fue exitosa
+    END
+END
+GO
+
+
+-- DELETE
+CREATE PROCEDURE DeleteProductCategory
+    @prod_cat_id INT
+AS
+BEGIN
+    -- Verificar si la categoría existe
+    IF EXISTS (SELECT 1 FROM ProductCategory WHERE prod_cat_id = @prod_cat_id)
+    BEGIN
+        -- Realizar el eliminado lógico
+        UPDATE ProductCategory
+        SET deleted = 1
+        WHERE prod_cat_id = @prod_cat_id;
+
+        SELECT 1 AS success; -- Indicar que el eliminado lógico fue exitoso
+    END
+    ELSE
+    BEGIN
+        -- La categoría no existe
+        SELECT 0 AS success; -- Indicar que la categoría no existe
+    END
+END;
+GO
+
+-- -------------------CRUD Product 
+DROP PROCEDURE InsertProduct
+GO
+CREATE PROCEDURE InsertProduct
+    @category_id INT,
+    @wh_id INT,
+    @unique_code VARCHAR(20),
+    @name VARCHAR(100),
+    @price DECIMAL(10, 2),
+    @stock INT,
+    @available BIT
+AS
+BEGIN
+    -- Verificar si la categoría y el almacén existen
+    IF EXISTS (SELECT 1 FROM ProductCategory WHERE prod_cat_id = @category_id)
+       AND EXISTS (SELECT 1 FROM WareHouse WHERE wh_id = @wh_id)
+    BEGIN
+        -- Insertar nuevo producto
+        INSERT INTO Product (category_id, wh_id, unique_code, name, price, stock, available)
+        VALUES (@category_id, @wh_id, @unique_code, @name, @price, @stock, @available);
+
+        SELECT SCOPE_IDENTITY() AS product_id; -- Devolver el ID del nuevo producto
+    END
+    ELSE
+    BEGIN
+        -- La categoría o el almacén no existen
+        SELECT -1 AS product_id; -- Indicar que la inserción no fue exitosa
+    END
+END;
+GO
+
+DROP PROCEDURE GetProducts
+GO
+CREATE PROCEDURE GetProducts
+AS
+BEGIN
+    SELECT
+        P.product_id,
+        P.category_id,
+        P.wh_id,
+        P.unique_code,
+        P.name,
+        P.price,
+        P.stock,
+        P.available,
+        PC.name AS category_name -- Agrega el nombre de la categoría
+    FROM
+        Product AS P
+        INNER JOIN ProductCategory AS PC ON P.category_id = PC.prod_cat_id;
+END;
+GO
+
+DROP PROCEDURE UpdateProduct
+GO
+CREATE PROCEDURE UpdateProduct
+    @product_id INT,
+    @category_id INT = NULL,
+    @wh_id INT = NULL,
+    @unique_code VARCHAR(20) = NULL,
+    @name VARCHAR(100) = NULL,
+    @price DECIMAL(10, 2) = NULL,
+    @stock INT = NULL,
+    @available BIT = NULL
+AS
+BEGIN
+    -- Verificar si el producto existe
+    IF EXISTS (SELECT 1 FROM Product WHERE product_id = @product_id)
+    BEGIN
+        -- Realizar la actualización
+        UPDATE Product
+        SET
+            category_id = COALESCE(@category_id, category_id),
+            wh_id = COALESCE(@wh_id, wh_id),
+            unique_code = COALESCE(@unique_code, unique_code),
+            name = COALESCE(@name, name),
+            price = COALESCE(@price, price),
+            stock = COALESCE(@stock, stock),
+            available = COALESCE(@available, available)
+        WHERE product_id = @product_id;
+
+        -- Seleccionar el producto actualizado
+        SELECT
+            product_id,
+            category_id,
+            wh_id,
+            unique_code,
+            name,
+            price,
+            stock,
+            available
+        FROM Product
+        WHERE product_id = @product_id;
+    END
+    ELSE
+    BEGIN
+        -- El producto no existe
+        SELECT 0 AS success; -- Indicar que la actualización no fue exitosa
+    END
+END;
+GO
+
+
+CREATE PROCEDURE DeleteProduct
+    @product_id INT
+AS
+BEGIN
+    -- Verificar si el producto existe
+    IF EXISTS (SELECT 1 FROM Product WHERE product_id = @product_id)
+    BEGIN
+        -- Realizar el eliminado lógico
+        UPDATE Product
+        SET available = 0
+        WHERE product_id = @product_id;
+
+        SELECT 1 AS success; -- Indicar que el eliminado lógico fue exitoso
+    END
+    ELSE
+    BEGIN
+        -- El producto no existe
+        SELECT 0 AS success; -- Indicar que el producto no existe
+    END
+END;
+GO
+
+
+DROP PROCEDURE InsertProductMaster
+GO
+
+Llama a este procedimiento en vez de hacer el insert directo:
+CREATE PROCEDURE InsertProduct
+    @category_id INT,
+    @wh_id INT,
+    @unique_code VARCHAR(20),
+    @name VARCHAR(100),
+    @price DECIMAL(10, 2),
+    @stock INT,
+    @available BIT
+AS
+BEGIN
+    -- Verificar si la categoría y el almacén existen
+    IF EXISTS (SELECT 1 FROM ProductCategory WHERE prod_cat_id = @category_id)
+       AND EXISTS (SELECT 1 FROM WareHouse WHERE wh_id = @wh_id)
+    BEGIN
+        -- Insertar nuevo producto
+        INSERT INTO Product (category_id, wh_id, unique_code, name, price, stock, available)
+        VALUES (@category_id, @wh_id, @unique_code, @name, @price, @stock, @available);
+
+        SELECT SCOPE_IDENTITY() AS product_id; -- Devolver el ID del nuevo producto
+    END
+    ELSE
+    BEGIN
+        -- La categoría o el almacén no existen
+        SELECT -1 AS product_id; -- Indicar que la inserción no fue exitosa
+    END
+END;
+GO
+
+
+-- --------------MASTER 
+
+CREATE PROCEDURE InsertProductMaster
+    @category_id INT,
+    @wh_id INT,
+    @unique_code VARCHAR(20),
+    @name VARCHAR(100),
+    @price DECIMAL(10, 2),
+    @stock INT,
+    @available BIT
+AS
+BEGIN
+    -- Llamar al procedimiento InsertProduct para realizar la inserción
+    DECLARE @result TABLE (product_id INT);
+
+    -- Determinar la base de datos según wh_id
+    DECLARE @dbName NVARCHAR(50);
+    SET @dbName = 
+        CASE 
+            WHEN @wh_id = 1 THEN 'Inventory_North'
+            WHEN @wh_id = 2 THEN 'Inventory_South'
+            WHEN @wh_id = 3 THEN 'Inventory_Caribbean'
+            ELSE NULL -- Puedes manejar otros casos según tus necesidades
+        END;
+
+    IF @dbName IS NOT NULL
+    BEGIN
+        -- Construir la llamada al procedimiento InsertProduct
+        DECLARE @sql NVARCHAR(MAX);
+        SET @sql = 'EXEC ' + QUOTENAME(@dbName) + '.dbo.InsertProduct ' +
+                   '@category_id, @wh_id, @unique_code, @name, @price, @stock, @available;';
+
+        -- Ejecutar la llamada al procedimiento
+        INSERT INTO @result
+        EXEC sp_executesql @sql,
+                           N'@category_id INT, @wh_id INT, @unique_code VARCHAR(20), @name VARCHAR(100), @price DECIMAL(10, 2), @stock INT, @available BIT',
+                           @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;
+    END
+    ELSE
+    BEGIN
+        -- El wh_id no tiene una base de datos asociada
+        INSERT INTO @result (product_id) VALUES (-1);
+    END
+
+    -- Obtener el resultado del procedimiento llamado
+    DECLARE @product_id INT;
+    SELECT @product_id = product_id FROM @result;
+
+    -- Devolver el ID del nuevo producto o indicar que la inserción no fue exitosa
+    IF @product_id IS NOT NULL AND @product_id != -1
+    BEGIN
+        SELECT @product_id AS product_id;
+    END
+    ELSE
+    BEGIN
+        SELECT -1 AS product_id; -- Indicar que la inserción no fue exitosa
+    END
+END;
+GO
+
+
+CREATE PROCEDURE GetProductsMaster
+    @wh_id INT = NULL
+AS
+BEGIN
+    -- Determinar la base de datos según wh_id
+    DECLARE @dbName NVARCHAR(50);
+    SET @dbName = 
+        CASE 
+            WHEN @wh_id = 1 THEN 'Inventory_North'
+            WHEN @wh_id = 2 THEN 'Inventory_South'
+            WHEN @wh_id = 3 THEN 'Inventory_Caribbean'
+            ELSE NULL -- Puedes manejar otros casos según tus necesidades
+        END;
+
+    -- Llamar al procedimiento GetProducts para recuperar los productos
+    IF @dbName IS NOT NULL
+    BEGIN
+        -- Construir la llamada al procedimiento GetProducts
+        DECLARE @sql NVARCHAR(MAX);
+        SET @sql = 'EXEC ' + QUOTENAME(@dbName) + '.dbo.GetProducts;';
+
+        -- Ejecutar la llamada al procedimiento
+        EXEC sp_executesql @sql;
+    END
+    ELSE
+    BEGIN
+        -- El wh_id no tiene una base de datos asociada
+        PRINT 'No se pudo determinar la base de datos asociada al wh_id.';
+    END
+END;
+GO
+
+
+CREATE PROCEDURE UpdateProductMaster
+    @product_id INT,
+    @category_id INT = NULL,
+    @wh_id INT = NULL,
+    @unique_code VARCHAR(20) = NULL,
+    @name VARCHAR(100) = NULL,
+    @price DECIMAL(10, 2) = NULL,
+    @stock INT = NULL,
+    @available BIT = NULL
+AS
+BEGIN
+    -- Determinar la base de datos según wh_id
+    DECLARE @dbName NVARCHAR(50);
+    SET @dbName = 
+        CASE 
+            WHEN @wh_id = 1 THEN 'Inventory_North'
+            WHEN @wh_id = 2 THEN 'Inventory_South'
+            WHEN @wh_id = 3 THEN 'Inventory_Caribbean'
+            ELSE NULL -- Puedes manejar otros casos según tus necesidades
+        END;
+
+    -- Llamar al procedimiento UpdateProduct para realizar la actualización
+    IF @dbName IS NOT NULL
+    BEGIN
+        -- Construir la llamada al procedimiento UpdateProduct
+        DECLARE @sql NVARCHAR(MAX);
+        SET @sql = 'EXEC ' + QUOTENAME(@dbName) + '.dbo.UpdateProduct ' +
+                   '@product_id, @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;';
+
+        -- Ejecutar la llamada al procedimiento
+        EXEC sp_executesql @sql,
+                           N'@product_id INT, @category_id INT, @wh_id INT, @unique_code VARCHAR(20), @name VARCHAR(100), @price DECIMAL(10, 2), @stock INT, @available BIT',
+                           @product_id, @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;
+    END
+    ELSE
+    BEGIN
+        -- El wh_id no tiene una base de datos asociada
+        SELECT 0 AS success; -- Indicar que la actualización no fue exitosa
+    END
+END;
+GO
