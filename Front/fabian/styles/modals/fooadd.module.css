@@ -1,0 +1,33 @@
+.field-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+
+  font-size: 0.7rem;
+}
+
+.field-group input {
+  height: 2rem;
+  width: 11.6rem;
+  border-radius: 8px;
+  border: 2px solid #eaeaea;
+}
+
+.field-group select {
+  height: 2rem;
+  width: 11.6rem;
+  border-radius: 8px;
+  border: 2px solid #eaeaea;
+  text-indent: 0.4rem;
+  background-color: white;
+}
+
+
+.input * {
+  width: 20rem;
+}

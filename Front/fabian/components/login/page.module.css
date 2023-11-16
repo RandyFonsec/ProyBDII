@@ -1,0 +1,15 @@
+.wrapper {
+  display: grid;
+  position: absolute;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+.img {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background-color: #94bcd6;
+}

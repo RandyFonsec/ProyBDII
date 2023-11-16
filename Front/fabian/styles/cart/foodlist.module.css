@@ -1,0 +1,51 @@
+.wrapper {
+  grid-column: 1;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: repeat(4, 14.4rem);
+  grid-auto-rows: 15rem;
+  padding: 0.5rem 1rem;
+  overflow-y: scroll;
+  background-color: #f7f7f7;
+  height: 75vh;
+}
+
+.food-item {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.food-img {
+  border-radius: 10px;
+}
+
+.text-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-summary {
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-summary button {
+  height: 2rem;
+  width: 5rem;
+  border: 2px solid #7d7d7d;
+  margin-top: 1rem;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.title {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.subtitle {
+  font-size: 0.7rem;
+  color: #adadad;
+}

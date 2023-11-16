@@ -1,0 +1,6 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: 72% 28%;
+  grid-template-rows: 30%  10% 60%;
+  background-color: #f7f7f7;
+}
