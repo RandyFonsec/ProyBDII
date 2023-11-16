@@ -12,7 +12,7 @@ function Products() {
 
   const fetchData = async () => {
       try {
-        const prods = await controller.getProducts(2);
+        const prods = await controller.getProducts(1);
         setProducts(prods);
       } catch (error) {
         console.error('Error fetching products:', error);

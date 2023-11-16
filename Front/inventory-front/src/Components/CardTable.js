@@ -35,7 +35,7 @@ function CardTable({products, prodHandler}) {
 
   const handleUpdate = async (product) => {
     try {
-      product.wh_id = 2;
+      product.wh_id = 1;
       const insertResult = await controller.updateProduct(product);
 
       if(insertResult){

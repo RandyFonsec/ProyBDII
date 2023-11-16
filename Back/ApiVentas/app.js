@@ -15,8 +15,6 @@ const router = require('./router');
 app.use('/api', router);
 
 
-
-
 app.listen(port, () => {
-  console.log(`Servidor Express escuchando en el puerto ${port}`);
+  console.log(`Api Ventas en puerto ${port}`);
 });

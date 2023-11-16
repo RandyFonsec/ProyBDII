@@ -20,6 +20,7 @@ const daoUsers = {
       throw error;
     }
   },
+  
 
   getProdCategories: async () => {
     //API BASE + ENDPOINT
@@ -47,11 +48,17 @@ const daoUsers = {
         body: JSON.stringify(productData),
       });
 
-      if (!response.ok) {
-        throw new Error('La solicitud no fue exitosa');
+      let exit;
+      if (response.status === 200) {
+          exit = {success : true, msg: 'Producto registrado'};
+      }else if(response.status === 203){
+          exit = {msg: 'Código único de producto ya registrado'};
+      }else{
+          exit = {msg: 'Error del servidor'};
       }
 
-      return response.json();
+      return exit;
+      
     } catch (error) {
       console.error('Error en la función insertProduct:', error);
       throw error;

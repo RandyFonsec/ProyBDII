@@ -15,18 +15,19 @@ function CardAdd({products, add}) {
 
   const handleAdd = async (product) => {
     try {
-      product.wh_id = 2;
+      product.wh_id = 1;
       const insertResult = await controller.insertProduct(product);
-      if (insertResult) {
+
+      if (insertResult.success) {
         setShow(true);
         setTitle("Éxito");
-        setMsg('Producto agregado exitosamente');
+        setMsg(insertResult.msg);
         add([...products, product]);
       } else {
         setShow(true);
         setTitle("Error");
         setMsg('Error al insertar el producto');
-        console.error('Error al insertar el producto:', insertResult.message);
+        console.error('Error al insertar el producto:', insertResult.msg);
       }
     }catch (error) {
       console.error('Error en la función handleAdd:', error);

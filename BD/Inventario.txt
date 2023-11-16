@@ -632,7 +632,6 @@ GO
 
 
 -- --------------MASTER 
-
 CREATE PROCEDURE InsertProductMaster
     @category_id INT,
     @wh_id INT,
@@ -643,6 +642,11 @@ CREATE PROCEDURE InsertProductMaster
     @available BIT
 AS
 BEGIN
+    -- Definir códigos de respuesta
+    DECLARE @SUCCESS INT = 200;
+    DECLARE @DATABASE_ERROR INT = 500;
+    DECLARE @INVALID_WH_ID INT = -1;
+
     -- Llamar al procedimiento InsertProduct para realizar la inserción
     DECLARE @result TABLE (product_id INT);
 
@@ -672,7 +676,7 @@ BEGIN
     ELSE
     BEGIN
         -- El wh_id no tiene una base de datos asociada
-        INSERT INTO @result (product_id) VALUES (-1);
+        INSERT INTO @result (product_id) VALUES (@INVALID_WH_ID);
     END
 
     -- Obtener el resultado del procedimiento llamado
@@ -680,22 +684,28 @@ BEGIN
     SELECT @product_id = product_id FROM @result;
 
     -- Devolver el ID del nuevo producto o indicar que la inserción no fue exitosa
-    IF @product_id IS NOT NULL AND @product_id != -1
+    IF @product_id IS NOT NULL AND @product_id != @INVALID_WH_ID
     BEGIN
-        SELECT @product_id AS product_id;
+        SELECT @SUCCESS AS Codigo, 'Inserción exitosa' AS Mensaje, @product_id AS product_id;
     END
     ELSE
     BEGIN
-        SELECT -1 AS product_id; -- Indicar que la inserción no fue exitosa
+        SELECT @DATABASE_ERROR AS Codigo, 'Error al realizar la inserción' AS Mensaje, NULL AS product_id;
     END
 END;
 GO
+
 
 
 CREATE PROCEDURE GetProductsMaster
     @wh_id INT = NULL
 AS
 BEGIN
+    -- Definir códigos de respuesta
+    DECLARE @SUCCESS INT = 200;
+    DECLARE @DATABASE_ERROR INT = 500;
+    DECLARE @INVALID_WH_ID INT = -1;
+
     -- Determinar la base de datos según wh_id
     DECLARE @dbName NVARCHAR(50);
     SET @dbName = 
@@ -714,15 +724,24 @@ BEGIN
         SET @sql = 'EXEC ' + QUOTENAME(@dbName) + '.dbo.GetProducts;';
 
         -- Ejecutar la llamada al procedimiento
-        EXEC sp_executesql @sql;
+        BEGIN TRY
+            EXEC sp_executesql @sql;
+            -- Devolver código de éxito
+            SELECT @SUCCESS AS Codigo, 'Consulta exitosa' AS Mensaje;
+        END TRY
+        BEGIN CATCH
+            -- Manejar el error y devolver código de error
+            SELECT @DATABASE_ERROR AS Codigo, 'Error al ejecutar la consulta' AS Mensaje, ERROR_MESSAGE() AS Detalles;
+        END CATCH
     END
     ELSE
     BEGIN
         -- El wh_id no tiene una base de datos asociada
-        PRINT 'No se pudo determinar la base de datos asociada al wh_id.';
+        SELECT @INVALID_WH_ID AS Codigo, 'No se pudo determinar la base de datos asociada al wh_id.' AS Mensaje;
     END
 END;
 GO
+
 
 
 CREATE PROCEDURE UpdateProductMaster
@@ -736,6 +755,11 @@ CREATE PROCEDURE UpdateProductMaster
     @available BIT = NULL
 AS
 BEGIN
+    -- Definir códigos de respuesta
+    DECLARE @SUCCESS INT = 200;
+    DECLARE @DATABASE_ERROR INT = 500;
+    DECLARE @INVALID_WH_ID INT = -1;
+
     -- Determinar la base de datos según wh_id
     DECLARE @dbName NVARCHAR(50);
     SET @dbName = 
@@ -755,14 +779,52 @@ BEGIN
                    '@product_id, @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;';
 
         -- Ejecutar la llamada al procedimiento
-        EXEC sp_executesql @sql,
-                           N'@product_id INT, @category_id INT, @wh_id INT, @unique_code VARCHAR(20), @name VARCHAR(100), @price DECIMAL(10, 2), @stock INT, @available BIT',
-                           @product_id, @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;
+        BEGIN TRY
+            EXEC sp_executesql @sql,
+                               N'@product_id INT, @category_id INT, @wh_id INT, @unique_code VARCHAR(20), @name VARCHAR(100), @price DECIMAL(10, 2), @stock INT, @available BIT',
+                               @product_id, @category_id, @wh_id, @unique_code, @name, @price, @stock, @available;
+            -- Devolver código de éxito
+            SELECT @SUCCESS AS Codigo, 'Actualización exitosa' AS Mensaje;
+        END TRY
+        BEGIN CATCH
+            -- Manejar el error y devolver código de error
+            SELECT @DATABASE_ERROR AS Codigo, 'Error al realizar la actualización' AS Mensaje, ERROR_MESSAGE() AS Detalles;
+        END CATCH
     END
     ELSE
     BEGIN
         -- El wh_id no tiene una base de datos asociada
-        SELECT 0 AS success; -- Indicar que la actualización no fue exitosa
+        SELECT @INVALID_WH_ID AS Codigo, 'No se pudo determinar la base de datos asociada al wh_id.' AS Mensaje;
+    END
+END;
+GO
+
+
+
+CREATE PROCEDURE DeleteProductMaster
+    @product_id INT
+AS
+BEGIN
+    -- Definir códigos de respuesta
+    DECLARE @SUCCESS INT = 200;
+    DECLARE @DATABASE_ERROR INT = 500;
+    DECLARE @PRODUCT_NOT_FOUND INT = -1;
+
+    -- Verificar si el producto existe
+    IF EXISTS (SELECT 1 FROM Product WHERE product_id = @product_id)
+    BEGIN
+        -- Realizar el marcado lógico
+        UPDATE Product
+        SET available = 0
+        WHERE product_id = @product_id;
+
+        -- Devolver código de éxito
+        SELECT @SUCCESS AS Codigo, 'Eliminación lógica exitosa' AS Mensaje;
+    END
+    ELSE
+    BEGIN
+        -- El producto no existe
+        SELECT @PRODUCT_NOT_FOUND AS Codigo, 'El producto no existe.' AS Mensaje;
     END
 END;
 GO
