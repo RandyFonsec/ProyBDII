@@ -1,0 +1,17 @@
+{
+  "name": "dbii-app",
+  "version": "1.0.0",
+  "pnpm": {
+    "workspaces": [
+      "client",
+      "server"
+    ]
+  },
+  "scripts": {
+    "start:all": "concurrently \"npm run dev --prefix client\" \"npm run start:dev --prefix server\"",
+    "start": "npm run start:all"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

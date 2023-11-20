@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "full_name": "Tania Sanchez",
+    "email": "tania.smith@example.com",
+    "username": "admin",
+    "password": "root",
+    "type": 1
+  },
+  {
+    "id": 2,
+    "full_name": "Fabián Vargas",
+    "email": "fa.vargas@example.com",
+    "username": "fabian",
+    "password": "1234",
+    "type": 2
+  }
+]

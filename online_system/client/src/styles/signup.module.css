@@ -1,11 +1,11 @@
 .login-card {
   position: absolute;
-  top: 4rem;
-  left: 30rem;
+  top: 1rem;
+  left: 25rem;
 
-  height: 30rem;
-  width: 25rem;
-  padding: 4rem;
+  height: 39rem;
+  width: 35rem;
+  padding: 2rem 4rem;
 
   border-radius: 15px;
 
@@ -13,7 +13,8 @@
 
   display: flex;
   justify-content: center;
-  background-color: rgb(193, 193, 193);
+  background-color: rgb(244, 244, 244);
+  border: 1px solid gray;
 }
 
 .login-card * {
@@ -21,10 +22,9 @@
   font-size: 0.7rem;
 }
 
-.login-card button, input {
+.login-card button, input, select {
   width: 18rem;
   border-radius: 10px;
-  margin: 0.5rem;
 }
 
 .login-card label, span {
@@ -39,26 +39,40 @@
   height: 2.5rem;
   color: white;
   border: none;
+  margin-left: 0.5rem;
+  margin-top: 1.5rem;
+
 }
 
-.form-field input {
+.login-btn-white {
+  background-color: white;
+  height: 2.5rem;
+  color: black;
+  border: none;
+  margin-left: 0.5rem;
+  border: 1px solid black;
+  margin-top: 0.5rem;
+}
+
+.form-field input, select {
   height: 2rem;
   background-color: white;
   border: 1px solid darkgray;
   color: black;
-  margin-bottom: 2rem;
   text-indent: 0.6rem;
+  margin-left: 0.5rem;
 }
 
 .title {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
   font-weight: normal;
 }
 
-.subtitle {
-  text-align: center;
-  font-size: 1rem;
+.error-msg-invalid {
+  position: relative;
+  bottom: 1rem;
   font-weight: normal;
-  margin-bottom: 2rem;
+  color: red;
 }

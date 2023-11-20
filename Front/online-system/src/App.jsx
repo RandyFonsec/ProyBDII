@@ -5,7 +5,7 @@ import Cart from './pages/Cart'
 function App() {
 
   return (
-    <Log/>
+    <Cart/>
   )
 }
 
